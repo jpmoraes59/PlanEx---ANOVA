@@ -277,7 +277,7 @@ export class AppComponent implements OnInit {
       var quadradodamediaY = this.quadradoDaMedia(arrayY, true);
       var mediasY = this.media(arrayY)
       var variancasY = this.calculavarinca(arrayY);
-
+      var SQRBlocos = quadradodamedia.somadosquadrados.total - quadradodamediaY.somadosquadrados.entreTratamento - quadradodamedia.somadosquadrados.entreTratamento
       /* 
       Lembrar de trocar o nome da caoluna da coluna 'causa de varianção'
       */
@@ -288,12 +288,12 @@ export class AppComponent implements OnInit {
             somaDosQuadrados: quadradodamedia.somadosquadrados.entreTratamento,
             grauDeLiberdade: quadradodamedia.graudeliberdade.entreTratamento,
             quadradoDaMedia: quadradodamedia.entreTratamento,
-            F: quadradodamedia.entreTratamento / quadradodamedia.dentroTratamento
-          },
+            F: quadradodamedia.entreTratamento / (SQRBlocos / (quadradodamedia.graudeliberdade.entreTratamento * quadradodamediaY.graudeliberdade.entreTratamento))
+          },//dentro é residuo
           dentroTratamento: {
-            somaDosQuadrados: quadradodamedia.somadosquadrados.dentroTratamento,
-            grauDeLiberdade: quadradodamedia.graudeliberdade.dentroTratamento,
-            quadradoDaMedia: quadradodamedia.dentroTratamento
+            somaDosQuadrados: SQRBlocos,
+            grauDeLiberdade: quadradodamedia.graudeliberdade.entreTratamento * quadradodamediaY.graudeliberdade.entreTratamento,
+            quadradoDaMedia: SQRBlocos / (quadradodamedia.graudeliberdade.entreTratamento * quadradodamediaY.graudeliberdade.entreTratamento)
           },
           total: {
             somaDosQuadrados: quadradodamedia.somadosquadrados.total,
@@ -305,7 +305,9 @@ export class AppComponent implements OnInit {
             somaDosQuadrados: quadradodamediaY.somadosquadrados.entreTratamento,
             grauDeLiberdade: quadradodamediaY.graudeliberdade.entreTratamento,
             quadradoDaMedia: quadradodamediaY.entreTratamento,
-            F: quadradodamediaY.entreTratamento / quadradodamediaY.dentroTratamento
+            // F: quadradodamediaY.entreTratamento / quadradodamediaY.dentroTratamento
+            F: quadradodamediaY.entreTratamento / (SQRBlocos / (quadradodamedia.graudeliberdade.entreTratamento * quadradodamediaY.graudeliberdade.entreTratamento))
+
           },
           dentroTratamento: {
             somaDosQuadrados: quadradodamediaY.somadosquadrados.dentroTratamento,

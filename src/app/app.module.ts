@@ -5,12 +5,14 @@ import { registerLocaleData } from '@angular/common';
 import localePtBr from '@angular/common/locales/pt';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { TabelaAnovaComponent } from './tabela-anova/tabela-anova.component';
 
 registerLocaleData(localePtBr);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    TabelaAnovaComponent
   ],
   imports: [
     BrowserModule,

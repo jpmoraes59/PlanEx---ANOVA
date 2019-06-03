@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
   public alfa: any;
   public alfaY: any;
   public indexEditar;
+  public resultado: any
+  public alfaPorcentagem: any;
 
   public formInicial: FormGroup;
   public tratamentos: Array<[]>;
@@ -198,11 +200,8 @@ export class AppComponent implements OnInit {
   }
 
   selecionarAlfa(x: any, y: any) {
-    console.log(this.formInicial.controls.alfa.value)
-    console.log(this.tabela5[1])
-    console.log(x, y)
-
-    switch (this.formInicial.controls.alfa.value) {
+    this.alfaPorcentagem = this.formInicial.controls.alfa.value
+    switch (this.alfaPorcentagem) {
       case '5':
         return this.tabela5[y - 1][x - 1]
       case '10':
@@ -261,7 +260,7 @@ export class AppComponent implements OnInit {
 
   calcular() {
     let retorno = this.tabela(this.tratamentos);
-
+    this.resultado = retorno
     this.medias = retorno.medias
     this.variancas = retorno.variancas
     this.tabelaAnova = retorno.table
@@ -271,7 +270,6 @@ export class AppComponent implements OnInit {
 
   apagarTratamento(index: number) {
     this.tratamentos.splice(index)
-
 
   }
 
@@ -454,7 +452,6 @@ export class AppComponent implements OnInit {
       this.alfa = this.selecionarAlfa(tabela.table.entreTratamento.grauDeLiberdade, tabela.table.dentroTratamento.grauDeLiberdade);
     } else {
       let arrayY = this.inverteArray();
-      console.log(arrayY)
       var quadradodamediaY = this.quadradoDaMedia(arrayY, true);
       var mediasY = this.media(arrayY)
       var variancasY = this.calculavarinca(arrayY);

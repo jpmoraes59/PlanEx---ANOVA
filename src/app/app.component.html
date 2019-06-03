@@ -1,83 +1,109 @@
+<div class="">
+	<div class="row justify-content-center">
+		<span>Logo</span>
+	</div>
+</div>
+
+
 <div class="container">
 
-	<!-- #region entrada de usuario  -->
 	<div class="row justify-content-center">
-		<div class="col-6">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 .col-xl-6">
 			<form [formGroup]="formInicial">
 				<div class="row">
-					<div class="col-6">
+					<div class="col-12">
+						<div class="row">
+							<div class="col-6">
+								<label>Tipo</label>
+								<select formControlName="tipoAnova" class="form-control">
+									<option>Experimentos</option>
+									<option>Blocos</option>
+								</select>
+							</div>
+							<div class="col-6">
+								<label>Alfa</label>
+								<select formControlName="alfa" class="form-control">
+									<option value="5">5%</option>
+									<option value="10">10%</option>
+									<option value="2.5">2,5%</option>
+									<option value="1.0">1,0%</option>
+									<option value="0.5">0,5%</option>
+
+								</select>
+							</div>
+
+						</div>
+
+					</div>
+					<div class="col-12">
 						<div class="form-group">
 							<label>Tratamentos</label>
-							<input class="form-control" formControlName="quantidadeTratamento">
+							<input type="text" class="form-control" formControlName="quantidadeTratamento">
 							<small class="form-text text-muted">Separe as repstições usando espaço.</small>
 						</div>
 					</div>
-					<div class="col-4">
-						<label>Tipo</label>
-						<select formControlName="tipoAnova" class="form-control">
-							<option>Experimentos</option>
-							<option>Blocos</option>
-						</select>
-					</div>
-					<div class="col-2">
-						<label>Alfa</label>
-						<select formControlName="alfa" class="form-control">
-							<option value="5">5%</option>
-							<option value="10">10%</option>
-							<option value="2.5">2,5%</option>
-							<option value="1.0">1,0%</option>
-							<option value="0.5">0,5%</option>
 
-						</select>
-					</div>
 				</div>
 			</form>
-		</div>
-		<!-- #endregion -->
-		<div class="col-12 text-center">
-			<button type="button" class="btn btn-primary mr-1" (click)="adicionarTratamentos()">Adiconar</button>
-			<button [disabled]="!podeCalcular" (click)="calcular()" type="button"
-				class="btn btn-danger">calcular</button>
-		</div>
+			<div class="col-12 text-center">
+				<button type="button" class="btn btn-primary mr-1" (click)="adicionarTratamentos()">Adiconar</button>
 
-	</div>
+			</div>
 
-	<div class="row">
-		<!-- tabela de tratamentos -->
-		<div class="col-12">
 			<ng-container *ngIf="tratamentos?.length > 0">
 				<h4>Tratamentos</h4>
 				<table class="table table-bordered">
-					<thead>
-						<tr>
+					<thead class="thead-light">
+						<tr class="text-center">
 							<th *ngFor="let tratamento of tratamentos; let i = index" scope="col">T {{i}}</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="text-center">
 						<td *ngFor="let tratamento of tratamentos; let i = index">
 							<tr *ngFor="let repeticao of tratamento; let i = index">
 								{{repeticao}}
 							</tr>
 							<tr class="text-center">
-								<button (click)="editarTratamento(i)">Editar</button>
-								<button (click)="apagarTratamento(i)">Apagar</button>
+								<button class="btn btn-outline-primary" (click)="editarTratamento(i)"> <i
+										class="fas fa-pen"></i>
+								</button>
+								<button class="btn btn-outline-danger" (click)="apagarTratamento(i)"> <i
+										class="fas fa-trash"></i>
+								</button>
 							</tr>
 						</td>
 					</tbody>
 				</table>
-				<button (click)="reiniciar('tabela')">
-					Reiniciar
-				</button>
+				<div class="text-right">
+					<button [disabled]="!podeCalcular" (click)="calcular()" type="button"
+						class="btn btn-success">calcular</button>
+
+
+				</div>
 			</ng-container>
 
-		</div>
 
-		<!-- inici etapa 2 medias e variaça -->
-		<div class="col-lg-6 col-md-12">
+			<!-- #endregion -->
+
+
+
+
+		</div>
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 .col-xl-6">
+			<ng-container *ngIf="!tabelaAnova">
+				<div class="embed-responsive embed-responsive-16by9">
+					<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/4PLzaoONIVc"
+						allowfullscreen></iframe>
+				</div>
+			</ng-container>
+
+
+
+			<!-- inici etapa 2 medias e variaça -->
 			<ng-container *ngIf="tabelaAnova">
 				<h4>Medias</h4>
 				<table class="table table-bordered">
-					<thead>
+					<thead class="thead-light">
 						<tr>
 							<th></th>
 							<th *ngFor="let tratamento of tratamentos; let i = index" scope="col">T {{i}}</th>
@@ -95,15 +121,13 @@
 					</tbody>
 				</table>
 			</ng-container>
-		</div>
-		<!-- fim da segunda etapa -->
+			<!-- fim da segunda etapa -->
 
-		<!-- inicio da terceira etapa tabela anova -->
-		<div class="col-lg-6 col-md-12">
+			<!-- inicio da terceira etapa tabela anova -->
 			<ng-container *ngIf="tabelaAnova">
 				<h4>Resumo anova</h4>
 				<table class="table table-bordered">
-					<thead>
+					<thead class="thead-light">
 						<tr>
 							<th scope="col">Causa de Variação</th>
 							<th scope="col">GL</th>
@@ -127,7 +151,7 @@
 								<td>{{tabelaAnova.entreTratamento.grauDeLiberdade | number}}</td>
 								<td>{{tabelaAnova.entreTratamento.somaDosQuadrados | number}}</td>
 								<td>{{tabelaAnova.entreTratamento.quadradoDaMedia | number}}</td>
-								<td>{{tabelaAnova.entreTratamento.F | number}}</td>
+								<td class="text-primary">{{tabelaAnova.entreTratamento.F | number}}</td>
 
 							</tr>
 							<tr>
@@ -144,23 +168,40 @@
 							</tr>
 						</ng-container>
 
-						<span>Alfa Blocos</span>
-						<span>{{tabelaAnovaY?.entreTratamento.grauDeLiberdade}}|</span>
-						<span>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}} = </span>
-						<span>{{alfaY}}</span>
-
-						<span>Alfa Tratamentos</span>
-						<span>{{tabelaAnova?.entreTratamento.grauDeLiberdade}}|</span>
-						<span>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}} = </span>
-						<span>{{alfa}}</span>
 					</tbody>
 				</table>
-				<button (click)="alerta()">
+				<h4 >F tabelado <span class="font-weight-light">{{alfaPorcentagem}}%</span></h4>
+				<table class="table table-bordered">
+					<thead class="thead-light">
+						<tr>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngIf="alfaY">
+							<th scope="row">Blocos</th>
+							<td>{{tabelaAnovaY?.entreTratamento.grauDeLiberdade}}</td>
+							<td>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}}</td>
+							<td>{{alfaY}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Tratamentos</th>
+							<td>{{tabelaAnova?.entreTratamento.grauDeLiberdade}}</td>
+							<td>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}}</td>
+							<td>{{alfa}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+				<button class="btn btn-danger" (click)="reiniciar()">
 					Reiniciar
 				</button>
 			</ng-container>
 
+
 		</div>
 	</div>
+
 </div>
+
 <!-- fim da terceira etapa tabela anova -->

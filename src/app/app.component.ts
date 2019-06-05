@@ -352,7 +352,7 @@ export class AppComponent implements OnInit {
     for (var i = 0; i < amostra.length; i++) {
       varianca += (this.smMean(amostra) - amostra[i]) * (this.smMean(amostra) - amostra[i]);
     }
-    varianca = varianca / amostra.length;
+    varianca = varianca / (amostra.length - 1);
     return varianca
   }
 

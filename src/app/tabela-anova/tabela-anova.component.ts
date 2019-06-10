@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import swal from 'sweetalert2';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-tabela-anova',
@@ -21,9 +22,12 @@ export class TabelaAnovaComponent implements OnInit {
 
   public historico: any
   public formInicial: FormGroup;
-  public tratamentos: Array<[]> = [];
+  public tratamentos: Array<[any]> = [];
   public podeCalcular: boolean = false;
   public abrirModal: boolean = false
+
+  public resultadoTratamento: object
+  public resultadoBloco: object
 
 
   public tabela10 = [[39.864, 49.500, 53.593, 55.833, 57.240, 58.204, 58.906, 59.439, 59.857, 60.195, 60.473, 60.705, 60.902, 61.073, 61.220, 61.740],
@@ -184,7 +188,7 @@ export class TabelaAnovaComponent implements OnInit {
 
 
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private number: DecimalPipe) {
 
   }
 
@@ -203,14 +207,24 @@ export class TabelaAnovaComponent implements OnInit {
   }
 
   adicionarHistorico() {
+    let jaTem: boolean = false;
 
     if (!this.historico) {
       this.historico = [this.tratamentos]
     } else {
-      if (this.historico.length > 4) {
-        this.historico.splice(0)
+      this.historico.forEach(element => {
+        if (this.tratamentos == element) {
+          jaTem = true
+        }
+      });
+      if (!jaTem) {
+
+        this.historico.push(this.tratamentos);
       }
-      this.historico.push(this.tratamentos);
+    }
+
+    if (this.historico.length > 3) {
+      this.historico.splice(0, 1)
     }
     localStorage.setItem('historico', JSON.stringify(this.historico));
   }
@@ -218,13 +232,13 @@ export class TabelaAnovaComponent implements OnInit {
   recuperahistorico(index) {
     this.tratamentos = this.historico[index]
     this.tratamentos.length > 1 ? this.podeCalcular = true : this.podeCalcular = false;
-
+    this.calcular()
   }
 
 
   criaFormInicial() {
     this.formInicial = this.fb.group({
-      quantidadeTratamento: new FormControl(''),
+      quantidadeTratamento: new FormControl('', [Validators.required]),
       tipoAnova: new FormControl('Experimentos'),
       alfa: new FormControl('5'),
     });
@@ -249,24 +263,21 @@ export class TabelaAnovaComponent implements OnInit {
   }
 
   adicionarTratamentos() {
- 
-    if (this.tratamentos.length == 0) {
-      console.log([this.formInicial.controls.quantidadeTratamento.value.split(" ")])
 
-      this.tratamentos = [this.formInicial.controls.quantidadeTratamento.value.split(" ")]
+    if (this.indexEditar !== null) {
+      this.tratamentos[this.indexEditar] = this.formInicial.controls.quantidadeTratamento.value.split(" ");
+      this.indexEditar = null;
     } else {
-      console.log('veio  2')
-      this.tratamentos.push(this.formInicial.controls.quantidadeTratamento.value.split(" "));
+      if (this.tratamentos.length == 0) {
+        this.tratamentos = [this.formInicial.controls.quantidadeTratamento.value.split(" ")]
+      } else {
+        this.tratamentos.push(this.formInicial.controls.quantidadeTratamento.value.split(" "));
+      }
     }
-    console.log('veio  3')
     this.tratamentos.length > 1 ? this.podeCalcular = true : this.podeCalcular = false;
     this.formInicial.controls.quantidadeTratamento.reset()
 
-    if (this.indexEditar !== null) {
-      this.tratamentos.splice(this.indexEditar, 1)
-      this.indexEditar = null;
-    }
-    console.log(this.tratamentos)
+
 
   }
 
@@ -296,6 +307,7 @@ export class TabelaAnovaComponent implements OnInit {
   calcular() {
     this.adicionarHistorico();
     let retorno = this.tabela(this.tratamentos);
+    this.resultadoFinal(retorno);
     this.resultado = retorno
     this.medias = retorno.medias
     this.variancas = retorno.variancas
@@ -428,7 +440,6 @@ export class TabelaAnovaComponent implements OnInit {
     };
   };
 
-
   // calcula quadrado da media
   quadradoDaMedia = function (amostra, verbose?) {
     var somadosquadrados = this.somaDosQuadrados(amostra);
@@ -449,7 +460,6 @@ export class TabelaAnovaComponent implements OnInit {
 
     return results;
   };
-
 
   // Calcula o F - Razao
   razao(amostra) {
@@ -493,10 +503,6 @@ export class TabelaAnovaComponent implements OnInit {
       var variancasY = this.calculavarinca(arrayY);
       var SQRBlocos = quadradodamedia.somadosquadrados.total - quadradodamediaY.somadosquadrados.entreTratamento - quadradodamedia.somadosquadrados.entreTratamento
 
-      /* 
-      Lembrar de trocar o nome da caoluna da coluna 'causa de varianção'
-      */
-
       tabela = {
         table: {
           entreTratamento: {
@@ -520,7 +526,6 @@ export class TabelaAnovaComponent implements OnInit {
             somaDosQuadrados: quadradodamediaY.somadosquadrados.entreTratamento,
             grauDeLiberdade: quadradodamediaY.graudeliberdade.entreTratamento,
             quadradoDaMedia: quadradodamediaY.entreTratamento,
-            // F: quadradodamediaY.entreTratamento / quadradodamediaY.dentroTratamento
             F: quadradodamediaY.entreTratamento / (SQRBlocos / (quadradodamedia.graudeliberdade.entreTratamento * quadradodamediaY.graudeliberdade.entreTratamento))
 
           },
@@ -546,6 +551,52 @@ export class TabelaAnovaComponent implements OnInit {
     }
     return tabela
 
+  }
+
+  resultadoFinal(tabela: any) {
+
+    if (tabela.tableY) {
+      //blocos
+      if (this.alfaY < tabela.table.entreTratamento.F) {
+        this.resultadoBloco = {
+          resultado: `${this.number.transform(this.alfaY, '1.0-4')} < ${this.number.transform(tabela.table.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `rejeita H0`, mensagem2: `existe diferença significativa entre as médias dos blocos`
+        }
+      } else {
+        this.resultadoBloco = {
+          resultado: `${this.number.transform(this.alfaY, '1.0-4')} > ${this.number.transform(tabela.table.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `aceita H0`, mensagem2: `não existe diferença significativa entre as médias dos blocos`
+        }
+      }
+      //tratamentos
+      if (this.alfa < tabela.tableY.entreTratamento.F) {
+        this.resultadoTratamento = {
+          resultado: `${this.number.transform(this.alfa, '1.0-4')} < ${this.number.transform(tabela.table.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `rejeita H0`, mensagem2: `existe diferença significativa entre as médias dos tratamentos`
+        }
+      } else {
+        this.resultadoTratamento = {
+          resultado: `${this.number.transform(this.alfa, '1.0-4')} > ${this.number.transform(tabela.tableY.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `aceita H0`, mensagem2: `não existe diferença significativa entre as médias dos tratamentos`
+        }
+      }
+
+
+    } else {
+      if (this.alfa < tabela.table.entreTratamento.F) {
+        this.resultadoTratamento = {
+          resultado: `${this.number.transform(this.alfa, '1.0-4')} < ${this.number.transform(tabela.table.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `rejeita H0`, mensagem2: `existe diferença significativa entre as médias dos tratamentos`
+        }
+      } else {
+        this.resultadoTratamento = {
+          resultado: `${this.number.transform(this.alfa, '1.0-4')} > ${this.number.transform(tabela.table.entreTratamento.F, '1.0-4')}`,
+          mensagem1: `aceita H0`, mensagem2: `não existe diferença significativa entre as médias dos tratamentos`
+        }
+      }
+    }
+
+    // this.resultadoTratamento
   }
 
 }

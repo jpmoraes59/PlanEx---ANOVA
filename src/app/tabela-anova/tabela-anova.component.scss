@@ -1,8 +1,4 @@
-.logo {
-    max-width: 15rem;
-    max-height: 5rem;
-  }
-  
+
   .card-header {
     background-color: #eee;
     cursor: pointer;
@@ -18,4 +14,9 @@
     display: block;
     background-color: white;
     overflow: hidden;
+  }
+  li{
+    span{
+     display: block;
+    }
   }

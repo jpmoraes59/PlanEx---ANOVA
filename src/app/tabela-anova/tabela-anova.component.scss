@@ -1,0 +1,21 @@
+.logo {
+    max-width: 15rem;
+    max-height: 5rem;
+  }
+  
+  .card-header {
+    background-color: #eee;
+    cursor: pointer;
+    transition: 0.4s;
+  }
+  
+  .active, .card-header:hover {
+    background-color: #ccc; 
+  }
+  
+  .panel {
+    padding: 0 18px;
+    display: block;
+    background-color: white;
+    overflow: hidden;
+  }

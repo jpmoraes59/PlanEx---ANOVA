@@ -1,0 +1,217 @@
+<div class="">
+	<div class="row justify-content-center">
+		<img class="logo" src="../assets/imgs/Logo_da_Unitins.png" alt="logo unitins">
+	</div>
+</div>
+
+
+<div class="container">
+
+	<div class="row justify-content-center">
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 .col-xl-6">
+			<form [formGroup]="formInicial">
+				<div class="row">
+					<div class="col-12">
+						<div class="row">
+							<div class="col-6">
+								<label>Tipo</label>
+								<select formControlName="tipoAnova" class="form-control">
+									<option>Experimentos</option>
+									<option>Blocos</option>
+								</select>
+							</div>
+							<div class="col-6">
+								<label>Alfa</label>
+								<select formControlName="alfa" class="form-control">
+									<option value="5">5%</option>
+									<option value="10">10%</option>
+									<option value="2.5">2,5%</option>
+									<option value="1.0">1,0%</option>
+									<option value="0.5">0,5%</option>
+								</select>
+							</div>
+
+						</div>
+
+					</div>
+					<div class="col-12">
+						<div class="form-group">
+							<label>Tratamentos</label>
+							<input type="text" class="form-control" formControlName="quantidadeTratamento">
+							<small class="form-text text-muted">Separe as repetições usando espaço.</small>
+						</div>
+					</div>
+
+				</div>
+			</form>
+			<div class="col-12 text-center">
+				<button type="button" class="btn btn-primary mr-1" (click)="adicionarTratamentos()">Adiconar</button>
+
+			</div>
+
+			<ng-container *ngIf="tratamentos?.length > 0">
+				<h4>Tratamentos</h4>
+				<table class="table table-bordered">
+					<thead class="thead-light">
+						<tr class="text-center">
+							<th *ngFor="let tratamento of tratamentos; let i = index" scope="col">T {{i}}</th>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+						<td *ngFor="let tratamento of tratamentos; let i = index">
+							<tr *ngFor="let repeticao of tratamento; let i = index">
+								{{repeticao}}
+							</tr>
+							<tr class="text-center">
+								<button class="btn btn-outline-primary" (click)="editarTratamento(i)"> <i
+										class="fas fa-pen"></i>
+								</button>
+								<button class="btn btn-outline-danger" (click)="apagarTratamento(i)"> <i
+										class="fas fa-trash"></i>
+								</button>
+							</tr>
+						</td>
+					</tbody>
+				</table>
+				<div class="text-right">
+					<button [disabled]="!podeCalcular" (click)="calcular()" type="button"
+						class="btn btn-success">calcular</button>
+
+
+				</div>
+			</ng-container>
+
+			<hr>
+
+			<div *ngIf="tratamentos?.length == 0" class="card">
+				<div (click)="abrirHistorico()" class="card-header">
+					Historico
+				</div>
+				<div *ngIf="abrirModal" class="card-body">
+					<div *ngIf='!historico'>
+						Historico vazio.
+					</div>
+					<ul>
+						<li *ngFor="let itemhistorico of historico; let i = index">
+							<label (click)="recuperahistorico(i)"> {{itemhistorico}} </label>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+
+			<!-- #endregion -->
+
+		</div>
+		<div class="col-12 col-sm-12 col-md-6 col-lg-6 .col-xl-6">
+			<ng-container *ngIf="!tabelaAnova">
+
+			</ng-container>
+
+
+			<!-- inici etapa 2 medias e variaça -->
+			<ng-container *ngIf="tabelaAnova">
+				<h4>Medias</h4>
+				<table class="table table-bordered">
+					<thead class="thead-light">
+						<tr>
+							<th></th>
+							<th *ngFor="let tratamento of tratamentos; let i = index" scope="col">T {{i}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">Media</th>
+							<td *ngFor="let media of medias; let i = index">{{media | number:'1.0-4'}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Varianca</th>
+							<td *ngFor="let varianca of variancas; let i = index">{{varianca | number:'1.0-4'}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</ng-container>
+			<!-- fim da segunda etapa -->
+
+			<!-- inicio da terceira etapa tabela anova -->
+			<ng-container *ngIf="tabelaAnova">
+				<h4>Resumo anova</h4>
+				<table class="table table-bordered">
+					<thead class="thead-light">
+						<tr>
+							<th scope="col">Causa de Variação</th>
+							<th scope="col">SQ</th>
+							<th scope="col">GL</th>
+							<th scope="col">MQ</th>
+							<th scope="col">F</th>
+						</tr>
+					</thead>
+					<tbody>
+						<ng-container>
+							<tr>
+								<th *ngIf="tabelaAnovaY" scope="row">Blocos</th>
+								<th *ngIf="!tabelaAnovaY" scope="row">Entre os Tratamentos</th>
+								<td>{{tabelaAnova.entreTratamento.somaDosQuadrados | number:'1.0-4'}}</td>
+								<td>{{tabelaAnova.entreTratamento.grauDeLiberdade | number:'1.0-4'}}</td>
+								<td>{{tabelaAnova.entreTratamento.quadradoDaMedia | number:'1.0-4'}}</td>
+								<td class="text-primary">{{tabelaAnova.entreTratamento.F | number:'1.0-4'}}</td>
+
+							</tr>
+							<tr *ngIf="tabelaAnovaY">
+								<th scope="row">Tratamentos</th>
+								<td>{{tabelaAnovaY.entreTratamento.somaDosQuadrados | number:'1.0-4'}}</td>
+								<td>{{tabelaAnovaY.entreTratamento.grauDeLiberdade | number:'1.0-4'}}</td>
+								<td>{{tabelaAnovaY.entreTratamento.quadradoDaMedia | number:'1.0-4'}}</td>
+								<td class="text-primary">{{tabelaAnovaY.entreTratamento.F | number:'1.0-4'}}</td>
+							</tr>
+							<tr>
+								<th *ngIf="tabelaAnovaY" scope="row">Residuos</th>
+								<th *ngIf="!tabelaAnovaY" scope="row">Dentro dos Tratamentos</th>
+								<td>{{tabelaAnova.dentroTratamento.somaDosQuadrados | number:'1.0-4'}}</td>
+								<td>{{tabelaAnova.dentroTratamento.grauDeLiberdade | number:'1.0-4'}}</td>
+								<td>{{tabelaAnova.dentroTratamento.quadradoDaMedia | number:'1.0-4'}}</td>
+							</tr>
+							<tr>
+								<th scope="row">total</th>
+								<td>{{tabelaAnova.total.somaDosQuadrados | number:'1.0-4'}}</td>
+								<td>{{tabelaAnova.total.grauDeLiberdade | number:'1.0-4'}}</td>
+							</tr>
+						</ng-container>
+
+					</tbody>
+				</table>
+				<h4>F tabelado <span class="font-weight-light">{{alfaPorcentagem}}%</span></h4>
+				<table class="table table-bordered">
+					<thead class="thead-light">
+						<tr>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngIf="alfaY">
+							<th scope="row">Blocos</th>
+							<td>{{tabelaAnovaY?.entreTratamento.grauDeLiberdade}}</td>
+							<td>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}}</td>
+							<td>{{alfaY}}</td>
+						</tr>
+						<tr>
+							<th scope="row">Tratamentos</th>
+							<td>{{tabelaAnova?.entreTratamento.grauDeLiberdade}}</td>
+							<td>{{tabelaAnova?.dentroTratamento.grauDeLiberdade}}</td>
+							<td>{{alfa}}</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+				<button class="btn btn-danger" (click)="reiniciar()">
+					Reiniciar
+				</button>
+			</ng-container>
+
+
+		</div>
+	</div>
+
+</div>
+
+<!-- fim da terceira etapa tabela anova -->
